@@ -1,31 +1,38 @@
 <script>
-	import Swal from "sweetalert2";
+	import { goto } from '$app/navigation';
+	import axios from 'axios';
+	import Swal from 'sweetalert2';
 
 	let username = '';
 	let password = '';
 
 	async function SignIn() {
 		try {
-			if (username =='' || password == ''){
+			if (username == '' || password == '') {
 				Swal.fire({
-				title : 'ตรวจสอบข้อมูล',
-				text: 'โปรดกรอกข้อมูลด้วย',
-				icon: 'warning'
-			})
+					title: 'ตรวจสอบข้อมูล',
+					text: 'โปรดกรอกข้อมูลด้วย',
+					icon: 'warning'
+				});
 			} else {
 				const payload = {
 					username: username,
 					password: password
-				}
+				};
 
-				const res = await axios.post('http://localhost:3000/api/user/signin',payload)
+				const res = await axios.post('http://localhost:3000/api/user/signin', payload);
+
+				if (res.data.token !== undefined) {
+					localStorage.setItem('fitness_token', res.data.token);
+					goto('/home');
+				}
 			}
 		} catch (e) {
 			Swal.fire({
-				title : 'error',
+				title: 'error',
 				text: e.message,
 				icon: 'error'
-			})
+			});
 		}
 	}
 </script>
@@ -35,14 +42,14 @@
 	<div class="card-body">
 		<div>
 			<div>Username</div>
-			<input class="form-control" bind:value={username}>
+			<input class="form-control" bind:value={username} />
 		</div>
 		<div class="mt-3">
 			<div>Password</div>
-			<input class="form-control mt-3" type='password' bind:value={password}>
+			<input class="form-control mt-3" type="password" bind:value={password} />
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" on:click={()=> SignIn()}>
+			<button class="btn btn-primary" on:click={() => SignIn()}>
 				<i class="fa fa-check mt-2">Sign In now</i>
 			</button>
 		</div>
